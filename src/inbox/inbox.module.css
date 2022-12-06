@@ -1,0 +1,13 @@
+.imgContainer .imgDownloadBtn {
+  display: none;
+  border-radius: 10px;
+  background-color: #FFFFFF;
+}
+
+.imgContainer:hover .imgDownloadBtn {
+  display: initial;
+}
+
+.imgContainer:hover .imgDownloadBtn:hover {
+  background-color: #CCCCCC;
+}
