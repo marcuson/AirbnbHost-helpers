@@ -2,6 +2,7 @@ import { PDFDocument, PDFFont, PDFPage } from 'pdf-lib';
 import { downloadBlob, downloadURL } from '../utils/dwl-utils';
 import { IPanelResult } from '@violentmonkey/ui';
 import { newPanel } from '../utils/ui-utils';
+import { TextItem } from 'pdfjs-dist/types/src/display/api';
 
 pdfjsLib.GlobalWorkerOptions.workerSrc =
   '//cdnjs.cloudflare.com/ajax/libs/pdf.js/3.5.141/pdf.worker.min.js';
@@ -22,34 +23,27 @@ const h = 12;
 const pdfPreviewCanvas = VM.m(
   <canvas id="pdfPreview" style="border: solid 1px;"></canvas>
 ) as HTMLCanvasElement;
+const impSoggiornoPanel: IPanelResult = initPanel();
 
-let impSoggiornoPanel: IPanelResult = null;
 let originalFile: File = null;
+let pdfDocOrig: PDFDocument = null;
+let pdfDoc: PDFDocument = null;
+
 let totalPrice: number = null;
+let refundedPrice: number = null;
 let startDate: string;
 let endDate: string;
-let refundedPrice: number = null;
-let pdfDoc: PDFDocument = null;
 
 export function openImpSoggiornoPanel() {
   if (!impSoggiornoPanel) {
     initPanel();
   }
 
-  impSoggiornoPanel.wrapper.style.top = '20px';
-  impSoggiornoPanel.wrapper.style.left = '20px';
-  impSoggiornoPanel.wrapper.style.width = `${window.innerWidth - 56}px`;
-  impSoggiornoPanel.wrapper.style.height = `${window.innerHeight - 56}px`;
-  impSoggiornoPanel.body.style.height = '100%';
   impSoggiornoPanel.show();
 }
 
-function initPanel() {
-  if (impSoggiornoPanel) {
-    return;
-  }
-
-  impSoggiornoPanel = newPanel({
+function initPanel(): IPanelResult {
+  return newPanel({
     content: VM.m(
       <div>
         <div>
@@ -93,6 +87,7 @@ function initPanel() {
 
 async function onFileChange(e: Event) {
   originalFile = (e.target as HTMLInputElement).files[0];
+  await updateDocOriginal();
   await updateDoc();
   await updatePreview();
   await updateDates();
@@ -120,7 +115,7 @@ function drawTextRightAlign(
   page.drawText(text, { x: xx, y: y, size: size });
 }
 
-async function updateDoc() {
+async function updateDocOriginal() {
   if (!originalFile) {
     return;
   }
@@ -133,45 +128,59 @@ async function updateDoc() {
     fileReader.readAsArrayBuffer(originalFile);
   });
 
-  pdfDoc = await PDFLib.PDFDocument.load(pdfFile);
+  pdfDocOrig = await PDFLib.PDFDocument.load(pdfFile);
+}
+
+async function updateDoc() {
+  if (!pdfDocOrig) {
+    return;
+  }
+
+  pdfDoc = await pdfDocOrig.copy();
   const font = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
   const page = pdfDoc.getPage(0);
+  let lineNr = 0;
 
-  drawTextRightAlign(page, lines[0], {
-    x: xL,
-    y: y + h * 0,
-    font: font,
-    size: fontSize,
-  });
+  if (totalPrice || refundedPrice) {
+    drawTextRightAlign(page, lines[0], {
+      x: xL,
+      y: y + h * lineNr,
+      font: font,
+      size: fontSize,
+    });
+    lineNr++;
+  }
 
   if (totalPrice) {
     drawTextRightAlign(page, lines[1], {
       x: xL,
-      y: y - h * 1,
+      y: y - h * lineNr,
       font: font,
       size: fontSize,
     });
     page.drawText(totalPrice.toFixed(2) + ' €', {
       x: xR,
-      y: y - h * 1,
+      y: y - h * lineNr,
       font: font,
       size: fontSize,
     });
+    lineNr++;
   }
 
   if (refundedPrice) {
     drawTextRightAlign(page, lines[2], {
       x: xL,
-      y: y - h * 2,
+      y: y - h * lineNr,
       font: font,
       size: fontSize,
     });
     page.drawText('-' + refundedPrice.toFixed(2) + ' €', {
       x: xR - font.widthOfTextAtSize('-', fontSize),
-      y: y - h * 2,
+      y: y - h * lineNr,
       font: font,
       size: fontSize,
     });
+    lineNr++;
   }
 }
 
@@ -187,7 +196,7 @@ async function updateDates() {
 
     let nextIsStartDate = false;
     let nextIsEndDate = false;
-    for (const textItem of textItems.items) {
+    for (const textItem of textItems.items as TextItem[]) {
       const str = textItem.str.replace(/\s/g, '');
       if (str === '') {
         continue;
@@ -218,13 +227,12 @@ async function updateDates() {
   } catch (e) {
     console.error(e);
   }
-
-  console.log(startDate, endDate);
 }
 
 function extractDate(date: string): string {
   return date.split('-').reverse().join('');
 }
+
 async function updatePreview() {
   if (!pdfDoc) {
     return;
@@ -248,12 +256,16 @@ async function render(canvas: HTMLCanvasElement, scale: number) {
   }
 }
 
+function getFilename(): string {
+  return `${startDate}-${endDate}`;
+}
+
 async function onDownloadBtnClick() {
   if (!pdfDoc) {
     return;
   }
 
-  const filename = `${startDate}-${endDate}`;
+  const filename = getFilename();
   downloadBlob(await pdfDoc.save(), `${filename}.pdf`, 'application/pdf');
 
   const canvas = document.createElement('canvas');
