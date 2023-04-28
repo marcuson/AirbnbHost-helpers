@@ -1,10 +1,9 @@
-import { PDFDocument, PDFFont, PDFPage, StandardFonts } from 'pdf-lib';
+import { PDFDocument, PDFFont, PDFPage } from 'pdf-lib';
 import { downloadBlob, downloadURL } from '../utils/dwl-utils';
 import { IPanelResult } from '@violentmonkey/ui';
 import { newPanel } from '../utils/ui-utils';
 
-const pdfjs = (window as any).pdfjsLib;
-pdfjs.GlobalWorkerOptions.workerSrc =
+pdfjsLib.GlobalWorkerOptions.workerSrc =
   '//cdnjs.cloudflare.com/ajax/libs/pdf.js/3.5.141/pdf.worker.min.js';
 
 const lines = [
@@ -134,8 +133,8 @@ async function updateDoc() {
     fileReader.readAsArrayBuffer(originalFile);
   });
 
-  pdfDoc = await PDFDocument.load(pdfFile);
-  const font = await pdfDoc.embedFont(StandardFonts.Helvetica);
+  pdfDoc = await PDFLib.PDFDocument.load(pdfFile);
+  const font = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
   const page = pdfDoc.getPage(0);
 
   drawTextRightAlign(page, lines[0], {
@@ -182,7 +181,7 @@ async function updateDates() {
   }
 
   try {
-    const pdf = await pdfjs.getDocument(await pdfDoc.save()).promise;
+    const pdf = await pdfjsLib.getDocument(await pdfDoc.save()).promise;
     const page = await pdf.getPage(1);
     const textItems = await page.getTextContent();
 
@@ -236,7 +235,7 @@ async function updatePreview() {
 
 async function render(canvas: HTMLCanvasElement, scale: number) {
   try {
-    const pdf = await pdfjs.getDocument(await pdfDoc.save()).promise;
+    const pdf = await pdfjsLib.getDocument(await pdfDoc.save()).promise;
     const page = await pdf.getPage(1);
     const viewport = page.getViewport({ scale: scale });
     const context = canvas.getContext('2d');
