@@ -96,7 +96,7 @@ async function onFileChange(e: Event) {
   originalFile = (e.target as HTMLInputElement).files[0];
   await updateDoc();
   await updatePreview();
-  // await updateDates();
+  await updateDates();
 }
 
 async function onTotalChange(e: Event) {
@@ -176,25 +176,56 @@ async function updateDoc() {
   }
 }
 
-// async function updateDates() {
-//   if (!pdfDoc) {
-//     return;
-//   }
+async function updateDates() {
+  if (!pdfDoc) {
+    return;
+  }
 
-//   try {
-//     const pdf = await pdfjs.getDocument(await pdfDoc.save()).promise;
-//     const page = await pdf.getPage(1);
-//     const viewport = page.getViewport({ scale: scale });
-//     const context = canvas.getContext('2d');
-//     canvas.height = viewport.height;
-//     canvas.width = viewport.width;
-//     const renderContext = { canvasContext: context, viewport: viewport };
-//     await page.render(renderContext).promise;
-//   } catch (e) {
-//     console.error(e);
-//   }
-// }
+  try {
+    const pdf = await pdfjs.getDocument(await pdfDoc.save()).promise;
+    const page = await pdf.getPage(1);
+    const textItems = await page.getTextContent();
 
+    let nextIsStartDate = false;
+    let nextIsEndDate = false;
+    for (const textItem of textItems.items) {
+      const str = textItem.str.replace(/\s/g, '');
+      if (str === '') {
+        continue;
+      }
+
+      if (str === 'Dal/From') {
+        nextIsStartDate = true;
+        continue;
+      }
+
+      if (str === 'Al/To') {
+        nextIsEndDate = true;
+        continue;
+      }
+
+      if (nextIsStartDate) {
+        nextIsStartDate = false;
+        startDate = extractDate(str);
+        continue;
+      }
+
+      if (nextIsEndDate) {
+        nextIsEndDate = false;
+        endDate = extractDate(str);
+        continue;
+      }
+    }
+  } catch (e) {
+    console.error(e);
+  }
+
+  console.log(startDate, endDate);
+}
+
+function extractDate(date: string): string {
+  return date.split('-').reverse().join('');
+}
 async function updatePreview() {
   if (!pdfDoc) {
     return;
@@ -223,14 +254,11 @@ async function onDownloadBtnClick() {
     return;
   }
 
-  const name = originalFile.name.replace('.pdf', '-1.pdf');
-  downloadBlob(await pdfDoc.save(), name, 'application/pdf');
+  const filename = `${startDate}-${endDate}`;
+  downloadBlob(await pdfDoc.save(), `${filename}.pdf`, 'application/pdf');
 
   const canvas = document.createElement('canvas');
   await render(canvas, 2);
-  await downloadURL(
-    canvas.toDataURL('image/png'),
-    name.replace('.pdf', '.png')
-  );
+  await downloadURL(canvas.toDataURL('image/png'), `${filename}.png`);
   canvas.remove();
 }
