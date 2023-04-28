@@ -14,6 +14,7 @@
 // @supportURL  https://github.com/marcuson/AirbnbHost-helpers/issues
 // @homepageURL https://github.com/marcuson/AirbnbHost-helpers
 // @require     https://cdn.jsdelivr.net/combine/npm/@violentmonkey/dom@2,npm/@violentmonkey/ui@0.7
+// @require     https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.5.141/pdf.min.js
 // ==/UserScript==
 
 /**
