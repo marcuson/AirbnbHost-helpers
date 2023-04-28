@@ -1,8 +1,12 @@
 import * as dom from '@violentmonkey/dom';
 import * as ui from '@violentmonkey/ui';
+import * as pdflib from 'pdf-lib';
+import * as pdfjs from 'pdfjs-dist';
 
 declare global {
   const VM: typeof dom & typeof ui;
+  const PDFLib: typeof pdflib;
+  const pdfjsLib: typeof pdfjs;
 
   namespace JSX {
     /**

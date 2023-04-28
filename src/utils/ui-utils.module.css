@@ -1,0 +1,17 @@
+.closeBtn {
+  border-radius: 100%;
+  background-color: #FFFFFF;
+  border-style: none;
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  cursor: pointer;
+}
+
+.closeBtn:hover {
+  background-color: #EEEEEE;
+}
+

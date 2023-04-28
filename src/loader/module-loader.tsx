@@ -1,15 +1,18 @@
 import * as inboxModule from '../inbox/inbox.module';
+import * as toolsModule from '../tools/tools.module';
 import { ModuleDef } from './module-def';
 
 function unloadModule(mod: ModuleDef) {
   if (!mod) {
-    console.info(`No current module to unload`);
+    console.info(`No module to unload`);
     return;
   }
 
-  console.info(`Unloading current module`);
+  console.info(`Unloading module ${mod.name}`);
 
-  const cssToRemove = document.querySelector('#ahh-current-module-style');
+  const cssToRemove = document.querySelector(
+    '#ahh-current-module-style-' + mod.name
+  );
   if (cssToRemove) {
     cssToRemove.remove();
   }
@@ -24,7 +27,7 @@ function loadModule(mod: ModuleDef) {
 
   if (mod.css) {
     document.head.append(
-      VM.m(<style id="ahh-current-module-style">{mod.css}</style>)
+      VM.m(<style id={'ahh-current-module-style-' + mod.name}>{mod.css}</style>)
     );
   }
 
@@ -40,6 +43,10 @@ function getCorrectModule(path: string): ModuleDef {
   }
 
   return undefined;
+}
+
+function loadPersistentModules() {
+  loadModule(toolsModule.moduleDef);
 }
 
 export function moduleLoaderInit() {
@@ -69,4 +76,6 @@ export function moduleLoaderInit() {
   });
 
   observer.observe(document.body, { childList: true, subtree: false });
+
+  loadPersistentModules();
 }
