@@ -1,5 +1,5 @@
 import { IPanelOptions, IPanelResult } from '@violentmonkey/ui';
-import { createElement, X } from 'lucide';
+import { X, createElement } from 'lucide';
 import styles, { stylesheet } from './ui-utils.module.css';
 
 export function newPanel(opts: IPanelOptions): IPanelResult {

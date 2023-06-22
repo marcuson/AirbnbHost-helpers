@@ -1,6 +1,6 @@
 import { IToastOptions, IToastResult } from '@violentmonkey/ui';
 import globalStyle from '../style.css';
-import styles, { stylesheet } from '../style.module.css';
+import styles, { stylesheet } from './toast.module.css';
 
 export type ToastType = 'success' | 'warning' | 'error';
 

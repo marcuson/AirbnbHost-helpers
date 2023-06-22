@@ -1,5 +1,7 @@
+import { createIcons, Download, FileText } from 'lucide';
+import { toast } from '../toast/toast';
+import { addImageToPdf } from '../tools/images-to-pdf';
 import { downloadImg } from '../utils/img-utils';
-import { createIcons, Download } from 'lucide';
 import styles from './inbox.module.css';
 
 let domThreadDisconnector: () => void;
@@ -68,11 +70,30 @@ function listenForDOMThreadImages(inboxThread: Element): () => void {
         </button>
       );
 
+      const addImageToPdfBtn = VM.m(
+        <button
+          class={styles.imgDownloadBtn}
+          onclick={async (e: Event) => {
+            e.preventDefault();
+            e.stopPropagation();
+            addImageToPdfConvert(newImageUrl);
+          }}
+        >
+          <i icon-name="file-text"></i>
+        </button>
+      );
+
       imageNode.classList.add(styles.imgContainer);
       imageNode.appendChild(downloadBtn);
+      imageNode.appendChild(addImageToPdfBtn);
       imageNode.setAttribute('data-ahh-augmented', 'true');
     }
 
-    createIcons({ icons: { Download } });
+    createIcons({ icons: { Download, FileText } });
   });
+
+  function addImageToPdfConvert(url: string) {
+    addImageToPdf({ url });
+    toast('success', 'Image added for later PDF conversion!');
+  }
 }

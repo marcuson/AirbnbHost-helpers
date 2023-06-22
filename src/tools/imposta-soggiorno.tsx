@@ -1,8 +1,9 @@
-import { PDFDocument, PDFFont, PDFPage } from 'pdf-lib';
-import { downloadBlob, downloadURL } from '../utils/dwl-utils';
 import { IPanelResult } from '@violentmonkey/ui';
-import { newPanel } from '../utils/ui-utils';
+import { PDFDocument } from 'pdf-lib';
 import { TextItem } from 'pdfjs-dist/types/src/display/api';
+import { downloadBlob, downloadURL } from '../utils/dwl-utils';
+import { drawTextRightAlign, renderPageOnCanvas } from '../utils/pdf-utils';
+import { newPanel } from '../utils/ui-utils';
 
 const lines = [
   'con le seguenti modalità:',
@@ -100,16 +101,6 @@ async function onRefundedChange(e: Event) {
   refundedPrice = parseInt((e.target as HTMLInputElement).value);
   await updateDoc();
   await updatePreview();
-}
-
-function drawTextRightAlign(
-  page: PDFPage,
-  text: string,
-  { x, y, font, size }: { x: number; y: number; font: PDFFont; size: number }
-) {
-  const textWidth = font.widthOfTextAtSize(text, size);
-  const xx = x - textWidth;
-  page.drawText(text, { x: xx, y: y, size: size });
 }
 
 async function updateDocOriginal() {
@@ -241,13 +232,7 @@ async function updatePreview() {
 async function render(canvas: HTMLCanvasElement, scale: number) {
   try {
     const pdf = await pdfjsLib.getDocument(await pdfDoc.save()).promise;
-    const page = await pdf.getPage(1);
-    const viewport = page.getViewport({ scale: scale });
-    const context = canvas.getContext('2d');
-    canvas.height = viewport.height;
-    canvas.width = viewport.width;
-    const renderContext = { canvasContext: context, viewport: viewport };
-    await page.render(renderContext).promise;
+    await renderPageOnCanvas(pdf, canvas, 1, scale);
   } catch (e) {
     console.error(e);
   }

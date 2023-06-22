@@ -1,8 +1,9 @@
-import { createIcons, PenTool } from 'lucide';
-import styles from './tools.module.css';
 import { IPanelResult } from '@violentmonkey/ui';
-import { openImpSoggiornoPanel } from './imposta-soggiorno';
+import { createIcons, PenTool } from 'lucide';
 import { newPanel } from '../utils/ui-utils';
+import { openImageToPdfPanel } from './images-to-pdf';
+import { openImpSoggiornoPanel } from './imposta-soggiorno';
+import styles from './tools.module.css';
 
 let toolsMenu: IPanelResult = null;
 
@@ -43,7 +44,10 @@ function initToolsMenu() {
     content: VM.m(
       <div>
         <div>
-          <button onclick={openImpSoggiorno}>RICEVUTA IMP. SOGGIORNO</button>
+          <button onclick={openImpSoggiorno} style="margin-right: 30px;">
+            RICEVUTA IMP. SOGGIORNO
+          </button>
+          <button onclick={openImageToPdf}>IMMAGINI &gt;&gt; PDF</button>
         </div>
       </div>
     ),
@@ -62,4 +66,9 @@ function openToolsMenu() {
 function openImpSoggiorno() {
   closeToolsMenu();
   openImpSoggiornoPanel();
+}
+
+function openImageToPdf() {
+  closeToolsMenu();
+  openImageToPdfPanel();
 }
