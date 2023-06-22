@@ -4,9 +4,6 @@ import { IPanelResult } from '@violentmonkey/ui';
 import { newPanel } from '../utils/ui-utils';
 import { TextItem } from 'pdfjs-dist/types/src/display/api';
 
-pdfjsLib.GlobalWorkerOptions.workerSrc =
-  '//cdnjs.cloudflare.com/ajax/libs/pdf.js/3.5.141/pdf.worker.min.js';
-
 const lines = [
   'con le seguenti modalità:',
   'riscossi tramite pagamento digitale Airbnb',
