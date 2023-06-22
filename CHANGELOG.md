@@ -1,3 +1,15 @@
+# [1.2.0](https://github.com/marcuson/AirbnbHost-helpers/compare/1.1.0...1.2.0) (2023-06-22)
+
+
+### Bug Fixes
+
+* Move pdfjs init in entrypoint file. ([d0e1028](https://github.com/marcuson/AirbnbHost-helpers/commit/d0e10282333763bd76cb855d137b3db266b70cbf))
+
+
+### Features
+
+* Add image to pdf feature. ([f77771b](https://github.com/marcuson/AirbnbHost-helpers/commit/f77771b805553dad8b40e4d22747666c59fb5a35))
+
 # [1.1.0](https://github.com/marcuson/AirbnbHost-helpers/compare/1.0.0...1.1.0) (2023-04-28)
 
 
