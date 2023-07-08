@@ -15,7 +15,7 @@ const fontSize = 9;
 
 const xL = 710;
 const xR = 717;
-const y = 76;
+const yDefault = 76;
 const h = 12;
 
 const pdfPreviewCanvas = VM.m(
@@ -29,6 +29,7 @@ let pdfDoc: PDFDocument = null;
 
 let totalPrice: number = null;
 let refundedPrice: number = null;
+let yValue: number = null;
 let startDate: string;
 let endDate: string;
 
@@ -63,6 +64,15 @@ function initPanel(): IPanelResult {
             type="number"
             id="refundedPrice"
             onchange={onRefundedChange}
+          ></input>
+        </div>
+        <div>
+          Coord. Y (dal basso):&nbsp;
+          <input
+            type="number"
+            id="yValue"
+            value="76"
+            onchange={onYValueChange}
           ></input>
         </div>
         <div>
@@ -103,6 +113,12 @@ async function onRefundedChange(e: Event) {
   await updatePreview();
 }
 
+async function onYValueChange(e: Event) {
+  yValue = parseInt((e.target as HTMLInputElement).value);
+  await updateDoc();
+  await updatePreview();
+}
+
 async function updateDocOriginal() {
   if (!originalFile) {
     return;
@@ -128,6 +144,7 @@ async function updateDoc() {
   const font = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
   const page = pdfDoc.getPage(0);
   let lineNr = 0;
+  const y = yValue || yDefault;
 
   if (totalPrice || refundedPrice) {
     drawTextRightAlign(page, lines[0], {
