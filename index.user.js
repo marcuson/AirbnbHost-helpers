@@ -5,7 +5,7 @@
 // @description Helpers for hosts on the Airbnb platform.
 // @match       https://www.airbnb.*/hosting
 // @match       https://www.airbnb.*/hosting/*
-// @version     1.2.0
+// @version     1.3.0
 // @author      marcuson
 // @license     GPL-3.0-or-later
 // @downloadURL https://github.com/marcuson/AirbnbHost-helpers/raw/gh-pages/index.user.js
@@ -26117,7 +26117,7 @@ const lines = ['con le seguenti modalità:', 'riscossi tramite pagamento digital
 const fontSize = 9;
 const xL = 710;
 const xR = 717;
-const y = 76;
+const yDefault = 76;
 const h = 12;
 const pdfPreviewCanvas = VM.m(VM.h("canvas", {
   id: "pdfPreview",
@@ -26129,6 +26129,7 @@ let pdfDocOrig = null;
 let pdfDoc = null;
 let totalPrice = null;
 let refundedPrice = null;
+let yValue = null;
 let startDate;
 let endDate;
 function openImpSoggiornoPanel() {
@@ -26152,6 +26153,11 @@ function initPanel() {
       type: "number",
       id: "refundedPrice",
       onchange: onRefundedChange
+    })), VM.h("div", null, "Coord. Y (dal basso):\xA0", VM.h("input", {
+      type: "number",
+      id: "yValue",
+      value: "76",
+      onchange: onYValueChange
     })), VM.h("div", null, VM.h("button", {
       onclick: async e => {
         e.preventDefault();
@@ -26181,6 +26187,11 @@ async function onRefundedChange(e) {
   await updateDoc();
   await updatePreview();
 }
+async function onYValueChange(e) {
+  yValue = parseInt(e.target.value);
+  await updateDoc();
+  await updatePreview();
+}
 async function updateDocOriginal() {
   if (!originalFile) {
     return;
@@ -26202,6 +26213,7 @@ async function updateDoc() {
   const font = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
   const page = pdfDoc.getPage(0);
   let lineNr = 0;
+  const y = yValue || yDefault;
   if (totalPrice || refundedPrice) {
     drawTextRightAlign(page, lines[0], {
       x: xL,
