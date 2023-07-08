@@ -1,3 +1,10 @@
+# [1.3.0](https://github.com/marcuson/AirbnbHost-helpers/compare/1.2.0...1.3.0) (2023-07-08)
+
+
+### Features
+
+* Add configurable imposta soggiorno text y coordinate. ([77c7f5e](https://github.com/marcuson/AirbnbHost-helpers/commit/77c7f5ee31a80033c75ba9042e71e34b609252d9))
+
 # [1.2.0](https://github.com/marcuson/AirbnbHost-helpers/compare/1.1.0...1.2.0) (2023-06-22)
 
 
