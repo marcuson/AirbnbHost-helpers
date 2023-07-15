@@ -5,14 +5,14 @@
 // @description Helpers for hosts on the Airbnb platform.
 // @match       https://www.airbnb.*/hosting
 // @match       https://www.airbnb.*/hosting/*
-// @version     1.3.0
+// @version     1.3.1
 // @author      marcuson
 // @license     GPL-3.0-or-later
 // @downloadURL https://github.com/marcuson/AirbnbHost-helpers/raw/gh-pages/index.user.js
 // @supportURL  https://github.com/marcuson/AirbnbHost-helpers/issues
 // @homepageURL https://github.com/marcuson/AirbnbHost-helpers
 // @require     https://cdn.jsdelivr.net/combine/npm/@violentmonkey/dom@2,npm/@violentmonkey/ui@0.7
-// @require     https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.5.141/pdf.min.js
+// @require     https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.8.162/pdf.min.js
 // @require     https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js
 // @grant       GM.addStyle
 // @grant       GM.getValue
@@ -69,6 +69,7 @@ var createElement$1 = ([tag, attrs, children]) => createElement(tag, attrs, chil
 /**
  * lucide v0.104.0 - ISC
  */
+
 
 const getAttrs = (element) => Array.from(element.attributes).reduce((attrs, attr) => {
   attrs[attr.name] = attr.value;
@@ -141,6 +142,7 @@ const defaultAttributes = {
  * lucide v0.104.0 - ISC
  */
 
+
 const Download = [
   "svg",
   defaultAttributes,
@@ -154,6 +156,7 @@ const Download = [
 /**
  * lucide v0.104.0 - ISC
  */
+
 
 const FileText = [
   "svg",
@@ -176,6 +179,7 @@ const FileText = [
  * lucide v0.104.0 - ISC
  */
 
+
 const PenTool = [
   "svg",
   defaultAttributes,
@@ -191,6 +195,7 @@ const PenTool = [
  * lucide v0.104.0 - ISC
  */
 
+
 const RotateCw = [
   "svg",
   defaultAttributes,
@@ -204,6 +209,7 @@ const RotateCw = [
  * lucide v0.104.0 - ISC
  */
 
+
 const X = [
   "svg",
   defaultAttributes,
@@ -216,6 +222,7 @@ const X = [
 /**
  * lucide v0.104.0 - ISC
  */
+
 
 const createIcons = ({ icons = {}, nameAttr = "icon-name", attrs = {} } = {}) => {
   if (!Object.values(icons).length) {
@@ -1008,114 +1015,118 @@ var error = function (msg) {
     throw new Error(msg);
 };
 
+function getDefaultExportFromCjs (x) {
+	return x && x.__esModule && Object.prototype.hasOwnProperty.call(x, 'default') ? x['default'] : x;
+}
+
 var common = {};
 
 (function (exports) {
 
 
-var TYPED_OK =  (typeof Uint8Array !== 'undefined') &&
-                (typeof Uint16Array !== 'undefined') &&
-                (typeof Int32Array !== 'undefined');
+	var TYPED_OK =  (typeof Uint8Array !== 'undefined') &&
+	                (typeof Uint16Array !== 'undefined') &&
+	                (typeof Int32Array !== 'undefined');
 
-function _has(obj, key) {
-  return Object.prototype.hasOwnProperty.call(obj, key);
-}
+	function _has(obj, key) {
+	  return Object.prototype.hasOwnProperty.call(obj, key);
+	}
 
-exports.assign = function (obj /*from1, from2, from3, ...*/) {
-  var sources = Array.prototype.slice.call(arguments, 1);
-  while (sources.length) {
-    var source = sources.shift();
-    if (!source) { continue; }
+	exports.assign = function (obj /*from1, from2, from3, ...*/) {
+	  var sources = Array.prototype.slice.call(arguments, 1);
+	  while (sources.length) {
+	    var source = sources.shift();
+	    if (!source) { continue; }
 
-    if (typeof source !== 'object') {
-      throw new TypeError(source + 'must be non-object');
-    }
+	    if (typeof source !== 'object') {
+	      throw new TypeError(source + 'must be non-object');
+	    }
 
-    for (var p in source) {
-      if (_has(source, p)) {
-        obj[p] = source[p];
-      }
-    }
-  }
+	    for (var p in source) {
+	      if (_has(source, p)) {
+	        obj[p] = source[p];
+	      }
+	    }
+	  }
 
-  return obj;
-};
-
-
-// reduce buffer size, avoiding mem copy
-exports.shrinkBuf = function (buf, size) {
-  if (buf.length === size) { return buf; }
-  if (buf.subarray) { return buf.subarray(0, size); }
-  buf.length = size;
-  return buf;
-};
+	  return obj;
+	};
 
 
-var fnTyped = {
-  arraySet: function (dest, src, src_offs, len, dest_offs) {
-    if (src.subarray && dest.subarray) {
-      dest.set(src.subarray(src_offs, src_offs + len), dest_offs);
-      return;
-    }
-    // Fallback to ordinary array
-    for (var i = 0; i < len; i++) {
-      dest[dest_offs + i] = src[src_offs + i];
-    }
-  },
-  // Join array of chunks to single array.
-  flattenChunks: function (chunks) {
-    var i, l, len, pos, chunk, result;
-
-    // calculate data length
-    len = 0;
-    for (i = 0, l = chunks.length; i < l; i++) {
-      len += chunks[i].length;
-    }
-
-    // join chunks
-    result = new Uint8Array(len);
-    pos = 0;
-    for (i = 0, l = chunks.length; i < l; i++) {
-      chunk = chunks[i];
-      result.set(chunk, pos);
-      pos += chunk.length;
-    }
-
-    return result;
-  }
-};
-
-var fnUntyped = {
-  arraySet: function (dest, src, src_offs, len, dest_offs) {
-    for (var i = 0; i < len; i++) {
-      dest[dest_offs + i] = src[src_offs + i];
-    }
-  },
-  // Join array of chunks to single array.
-  flattenChunks: function (chunks) {
-    return [].concat.apply([], chunks);
-  }
-};
+	// reduce buffer size, avoiding mem copy
+	exports.shrinkBuf = function (buf, size) {
+	  if (buf.length === size) { return buf; }
+	  if (buf.subarray) { return buf.subarray(0, size); }
+	  buf.length = size;
+	  return buf;
+	};
 
 
-// Enable/Disable typed arrays use, for testing
-//
-exports.setTyped = function (on) {
-  if (on) {
-    exports.Buf8  = Uint8Array;
-    exports.Buf16 = Uint16Array;
-    exports.Buf32 = Int32Array;
-    exports.assign(exports, fnTyped);
-  } else {
-    exports.Buf8  = Array;
-    exports.Buf16 = Array;
-    exports.Buf32 = Array;
-    exports.assign(exports, fnUntyped);
-  }
-};
+	var fnTyped = {
+	  arraySet: function (dest, src, src_offs, len, dest_offs) {
+	    if (src.subarray && dest.subarray) {
+	      dest.set(src.subarray(src_offs, src_offs + len), dest_offs);
+	      return;
+	    }
+	    // Fallback to ordinary array
+	    for (var i = 0; i < len; i++) {
+	      dest[dest_offs + i] = src[src_offs + i];
+	    }
+	  },
+	  // Join array of chunks to single array.
+	  flattenChunks: function (chunks) {
+	    var i, l, len, pos, chunk, result;
 
-exports.setTyped(TYPED_OK);
-}(common));
+	    // calculate data length
+	    len = 0;
+	    for (i = 0, l = chunks.length; i < l; i++) {
+	      len += chunks[i].length;
+	    }
+
+	    // join chunks
+	    result = new Uint8Array(len);
+	    pos = 0;
+	    for (i = 0, l = chunks.length; i < l; i++) {
+	      chunk = chunks[i];
+	      result.set(chunk, pos);
+	      pos += chunk.length;
+	    }
+
+	    return result;
+	  }
+	};
+
+	var fnUntyped = {
+	  arraySet: function (dest, src, src_offs, len, dest_offs) {
+	    for (var i = 0; i < len; i++) {
+	      dest[dest_offs + i] = src[src_offs + i];
+	    }
+	  },
+	  // Join array of chunks to single array.
+	  flattenChunks: function (chunks) {
+	    return [].concat.apply([], chunks);
+	  }
+	};
+
+
+	// Enable/Disable typed arrays use, for testing
+	//
+	exports.setTyped = function (on) {
+	  if (on) {
+	    exports.Buf8  = Uint8Array;
+	    exports.Buf16 = Uint16Array;
+	    exports.Buf32 = Int32Array;
+	    exports.assign(exports, fnTyped);
+	  } else {
+	    exports.Buf8  = Array;
+	    exports.Buf16 = Array;
+	    exports.Buf32 = Array;
+	    exports.assign(exports, fnUntyped);
+	  }
+	};
+
+	exports.setTyped(TYPED_OK); 
+} (common));
 
 var deflate$4 = {};
 
@@ -7766,6 +7777,8 @@ assign(pako, deflate, inflate, constants);
 
 var pako_1 = pako;
 
+var pako$1 = /*@__PURE__*/getDefaultExportFromCjs(pako_1);
+
 /*
  * The `chars`, `lookup`, and `decodeFromBase64` members of this file are
  * licensed under the following:
@@ -7818,7 +7831,7 @@ var arrayToString = function (array) {
     return str;
 };
 var decompressJson = function (compressedJson) {
-    return arrayToString(pako_1.inflate(decodeFromBase64(compressedJson)));
+    return arrayToString(pako$1.inflate(decodeFromBase64(compressedJson)));
 };
 var padStart = function (value, length, padChar) {
     var padding = '';
@@ -9413,7 +9426,7 @@ var PDFFlateStream = /** @class */ (function (_super) {
         var _this = _super.call(this, dict) || this;
         _this.computeContents = function () {
             var unencodedContents = _this.getUnencodedContents();
-            return _this.encode ? pako_1.deflate(unencodedContents) : unencodedContents;
+            return _this.encode ? pako$1.deflate(unencodedContents) : unencodedContents;
         };
         _this.encode = encode;
         if (encode)
@@ -9636,7 +9649,7 @@ var PDFContext = /** @class */ (function () {
     };
     PDFContext.prototype.flateStream = function (contents, dict) {
         if (dict === void 0) { dict = {}; }
-        return this.stream(pako_1.deflate(typedArrayFor(contents)), __assign(__assign({}, dict), { Filter: 'FlateDecode' }));
+        return this.stream(pako$1.deflate(typedArrayFor(contents)), __assign(__assign({}, dict), { Filter: 'FlateDecode' }));
     };
     PDFContext.prototype.contentStream = function (operators, dict) {
         if (dict === void 0) { dict = {}; }
@@ -12254,7 +12267,7 @@ UPNG.encode._filterZero = function(img,h,bpp,bpl,data, filter, levelZero)
 	else if(h*bpl>500000 || bpp==1) ftry=[0];
 	var opts;  if(levelZero) opts={level:0};
 	
-	var CMPR = (levelZero && UZIP!=null) ? UZIP : pako_1;
+	var CMPR = (levelZero && UZIP!=null) ? UZIP : pako$1;
 	
 	for(var i=0; i<ftry.length; i++) {
 		for(var y=0; y<h; y++) UPNG.encode._filterLine(data, img, y, bpl, bpp, ftry[i]);
@@ -17055,6 +17068,9 @@ var colorToComponents = function (color) {
 };
 
 // Originated from pdfkit Copyright (c) 2014 Devon Govett
+// https://github.com/foliojs/pdfkit/blob/1e62e6ffe24b378eb890df507a47610f4c4a7b24/lib/path.js
+// MIT LICENSE
+// Updated for pdf-lib & TypeScript by Jeremy Messenger
 var cx = 0;
 var cy = 0;
 var px = 0;
@@ -26452,7 +26468,7 @@ function moduleLoaderInit() {
 }
 
 console.info('Loading Airbnb host helper');
-pdfjsLib.GlobalWorkerOptions.workerSrc = '//cdnjs.cloudflare.com/ajax/libs/pdf.js/3.5.141/pdf.worker.min.js';
+pdfjsLib.GlobalWorkerOptions.workerSrc = '//cdnjs.cloudflare.com/ajax/libs/pdf.js/3.8.162/pdf.worker.min.js';
 document.head.append(VM.m(VM.h("style", null, css_248z)));
 moduleLoaderInit();
 
