@@ -1,3 +1,10 @@
+## [1.3.1](https://github.com/marcuson/AirbnbHost-helpers/compare/1.3.0...1.3.1) (2023-07-15)
+
+
+### Bug Fixes
+
+* Fix pdfjs-lib worker loading. ([765ea66](https://github.com/marcuson/AirbnbHost-helpers/commit/765ea66aa1ed28aa74e15698f48ee14e2403fe9a))
+
 # [1.3.0](https://github.com/marcuson/AirbnbHost-helpers/compare/1.2.0...1.3.0) (2023-07-08)
 
 
