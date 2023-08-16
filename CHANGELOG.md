@@ -1,3 +1,11 @@
+# [1.4.0](https://github.com/marcuson/AirbnbHost-helpers/compare/1.3.1...1.4.0) (2023-08-16)
+
+
+### Features
+
+* Automatically compute filename for image-to-pdf download. ([d31c2a3](https://github.com/marcuson/AirbnbHost-helpers/commit/d31c2a33d8d62a8952615b736a810916410f5c3a))
+* Automatically compute Y coord in "imposta-soggiorno" module. ([109053c](https://github.com/marcuson/AirbnbHost-helpers/commit/109053c5ccd311ad88a08a93d2337c46e619379b))
+
 ## [1.3.1](https://github.com/marcuson/AirbnbHost-helpers/compare/1.3.0...1.3.1) (2023-07-15)
 
 
