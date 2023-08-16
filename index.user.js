@@ -5,7 +5,7 @@
 // @description Helpers for hosts on the Airbnb platform.
 // @match       https://www.airbnb.*/hosting
 // @match       https://www.airbnb.*/hosting/*
-// @version     1.3.1
+// @version     1.4.0
 // @author      marcuson
 // @license     GPL-3.0-or-later
 // @downloadURL https://github.com/marcuson/AirbnbHost-helpers/raw/gh-pages/index.user.js
@@ -25818,6 +25818,19 @@ var PDFButton = /** @class */ (function (_super) {
 }(PDFField));
 var PDFButton$1 = PDFButton;
 
+const EVENT_RESERVATION_CTX = 'event:reservation-ctx';
+
+class AppCtx {
+  set reservationCtx(value) {
+    this._reservationCtx = value;
+    document.dispatchEvent(new Event(EVENT_RESERVATION_CTX));
+  }
+  get reservationCtx() {
+    return this._reservationCtx;
+  }
+}
+const appCtx = new AppCtx();
+
 function downloadURL(data, fileName) {
   const a = document.createElement('a');
   a.href = data;
@@ -25860,8 +25873,6 @@ const imageEntries = [];
 let imagesDiv;
 const imageContainers = [];
 const images = [];
-let startDate$1;
-let endDate$1;
 const imagesToPdfPanel = initPanel$1();
 function addImageToPdf(entry) {
   imageEntries.push(entry);
@@ -25886,6 +25897,13 @@ function initPanel$1() {
         onDownloadBtnClick$1();
       }
     }, "Scarica file PDF"), VM.h("button", {
+      style: "margin-right: 30px;",
+      onclick: async e => {
+        e.preventDefault();
+        e.stopPropagation();
+        onDownloadBtnClick$1('-DOCS');
+      }
+    }, "Scarica file PDF (doc. identit\xE0)"), VM.h("button", {
       onclick: async e => {
         e.preventDefault();
         e.stopPropagation();
@@ -25941,7 +25959,8 @@ function clear() {
   imageEntries.length = 0;
 }
 function getFilename$1() {
-  return `${startDate$1}-${endDate$1}`;
+  var _appCtx$reservationCt, _appCtx$reservationCt2;
+  return `${(_appCtx$reservationCt = appCtx.reservationCtx) == null ? void 0 : _appCtx$reservationCt.dateFromStr}-${(_appCtx$reservationCt2 = appCtx.reservationCtx) == null ? void 0 : _appCtx$reservationCt2.dateToStr}`;
 }
 async function generatePdf() {
   const pdfDoc = await PDFDocument.create();
@@ -25987,10 +26006,10 @@ function onRotateBtnClick(imageIdx) {
 function onClearBtnClick() {
   clear();
 }
-async function onDownloadBtnClick$1() {
+async function onDownloadBtnClick$1(filenameSuffix) {
   const pdfDoc = await generatePdf();
   const filename = getFilename$1();
-  downloadBlob(await pdfDoc.save(), `${filename}.pdf`, 'application/pdf');
+  downloadBlob(await pdfDoc.save(), `${filename}${filenameSuffix != null ? filenameSuffix : ''}.pdf`, 'application/pdf');
 }
 
 async function downloadImg(imageUrl) {
@@ -26009,16 +26028,16 @@ var styles$1 = {"imgContainer":"inbox-module_imgContainer__sQDNX","imgDownloadBt
 var stylesheet$1=".inbox-module_imgContainer__sQDNX .inbox-module_imgDownloadBtn__CCkFw{background-color:#fff;border-radius:10px;display:none}.inbox-module_imgContainer__sQDNX:hover .inbox-module_imgDownloadBtn__CCkFw{display:initial}.inbox-module_imgContainer__sQDNX:hover .inbox-module_imgDownloadBtn__CCkFw:hover{background-color:#ccc}";
 
 function _wrapRegExp() { _wrapRegExp = function (re, groups) { return new BabelRegExp(re, void 0, groups); }; var _super = RegExp.prototype, _groups = new WeakMap(); function BabelRegExp(re, flags, groups) { var _this = new RegExp(re, flags); return _groups.set(_this, groups || _groups.get(re)), _setPrototypeOf(_this, BabelRegExp.prototype); } function buildGroups(result, re) { var g = _groups.get(re); return Object.keys(g).reduce(function (groups, name) { var i = g[name]; if ("number" == typeof i) groups[name] = result[i];else { for (var k = 0; void 0 === result[i[k]] && k + 1 < i.length;) k++; groups[name] = result[i[k]]; } return groups; }, Object.create(null)); } return _inherits(BabelRegExp, RegExp), BabelRegExp.prototype.exec = function (str) { var result = _super.exec.call(this, str); if (result) { result.groups = buildGroups(result, this); var indices = result.indices; indices && (indices.groups = buildGroups(indices, this)); } return result; }, BabelRegExp.prototype[Symbol.replace] = function (str, substitution) { if ("string" == typeof substitution) { var groups = _groups.get(this); return _super[Symbol.replace].call(this, str, substitution.replace(/\$<([^>]+)>/g, function (_, name) { var group = groups[name]; return "$" + (Array.isArray(group) ? group.join("$") : group); })); } if ("function" == typeof substitution) { var _this = this; return _super[Symbol.replace].call(this, str, function () { var args = arguments; return "object" != typeof args[args.length - 1] && (args = [].slice.call(args)).push(buildGroups(args, _this)), substitution.apply(this, args); }); } return _super[Symbol.replace].call(this, str, substitution); }, _wrapRegExp.apply(this, arguments); }
-let domThreadDisconnector;
+let domThreadDisconnector$1;
 let domThreadImagesDisconnector;
-function startObserveDOM() {
-  domThreadDisconnector = listenForDOMThread();
+function startObserveDOM$1() {
+  domThreadDisconnector$1 = listenForDOMThread$1();
 }
-function stopObserveDOM() {
-  domThreadDisconnector();
+function stopObserveDOM$1() {
+  domThreadDisconnector$1();
   domThreadImagesDisconnector();
 }
-function listenForDOMThread() {
+function listenForDOMThread$1() {
   return VM.observe(document.body, () => {
     const inboxThread = document.querySelector('section[data-testid=orbital-panel-host-messaging-message-thread]');
     if (inboxThread) {
@@ -26085,16 +26104,83 @@ function listenForDOMThreadImages(inboxThread) {
   }
 }
 
+const threeLetterMonthToNumMap = {
+  gen: 1,
+  feb: 2,
+  mar: 3,
+  apr: 4,
+  mag: 5,
+  giu: 6,
+  lug: 7,
+  ago: 8,
+  set: 9,
+  ott: 10,
+  nov: 11,
+  dic: 12
+};
+function threeLetterMonthToNum(month) {
+  return threeLetterMonthToNumMap[month];
+}
+
+let domThreadDisconnector;
+function startObserveDOM() {
+  domThreadDisconnector = listenForDOMThread();
+}
+function stopObserveDOM() {
+  domThreadDisconnector();
+}
+function listenForDOMThread() {
+  return VM.observe(document.body, () => {
+    const inboxHeader = document.querySelector('button[data-testid=host-inbox-open-thread-details-button] h3');
+    if (inboxHeader) {
+      console.debug('Inbox header loaded, get reservation ctx');
+      extractResCtxFromInboxHeader(inboxHeader);
+      return true;
+    }
+    const detailsHeader = document.querySelector('div[data-testid=host-inbox-reservation-details] #FMP-target');
+    if (detailsHeader) {
+      console.debug('Details header loaded, get reservation ctx');
+      extractReservationCtxFromDetailsHeader(detailsHeader);
+      return true;
+    }
+  });
+}
+function extractResCtxFromInboxHeader(inboxHeader) {
+  const dateRangeText = inboxHeader.nextSibling.textContent.split('·')[1].trim();
+  extractReservationCtxFromText(dateRangeText);
+}
+function extractReservationCtxFromDetailsHeader(detailsHeader) {
+  const dateRangeText = detailsHeader.nextSibling.nextSibling.textContent;
+  extractReservationCtxFromText(dateRangeText);
+}
+function extractReservationCtxFromText(dateRangeText) {
+  const [daysRange, monthThreeLett, yearSplit] = dateRangeText.replace(/\(.*/, '').trim().split(' ');
+  const year = yearSplit != null ? yearSplit : new Date().getFullYear().toString();
+  const month = threeLetterMonthToNum(monthThreeLett).toFixed(0).padStart(2, '0');
+  const [dayStart, dayEnd] = daysRange.split('–').map(x => x.padStart(2, '0'));
+  const resCtx = {
+    dateFromStr: `${year}${month}${dayStart}`,
+    dateToStr: `${year}${month}${dayEnd}`
+  };
+  appCtx.reservationCtx = resCtx;
+}
+
 const moduleDef$1 = {
   name: 'inbox',
   css: stylesheet$1,
   initFn: () => {
+    startObserveDOM$1();
     startObserveDOM();
   },
   stopFn: () => {
+    stopObserveDOM$1();
     stopObserveDOM();
   }
 };
+
+function roundToDecimal(num, decimals) {
+  return Number(num.toFixed(decimals));
+}
 
 async function renderPageOnCanvas(pdf, canvas, pageNum, scale) {
   try {
@@ -26133,7 +26219,8 @@ const lines = ['con le seguenti modalità:', 'riscossi tramite pagamento digital
 const fontSize = 9;
 const xL = 710;
 const xR = 717;
-const yDefault = 76;
+const yStart = 150;
+const rowH = 20;
 const h = 12;
 const pdfPreviewCanvas = VM.m(VM.h("canvas", {
   id: "pdfPreview",
@@ -26148,6 +26235,8 @@ let refundedPrice = null;
 let yValue = null;
 let startDate;
 let endDate;
+let guestsNum = 0;
+let previewScale = 1;
 function openImpSoggiornoPanel() {
   if (!impSoggiornoPanel) {
     initPanel();
@@ -26172,7 +26261,6 @@ function initPanel() {
     })), VM.h("div", null, "Coord. Y (dal basso):\xA0", VM.h("input", {
       type: "number",
       id: "yValue",
-      value: "76",
       onchange: onYValueChange
     })), VM.h("div", null, VM.h("button", {
       onclick: async e => {
@@ -26189,9 +26277,9 @@ function initPanel() {
 async function onFileChange(e) {
   originalFile = e.target.files[0];
   await updateDocOriginal();
+  await updateConfigFromDocOriginal();
   await updateDoc();
   await updatePreview();
-  await updateDates();
 }
 async function onTotalChange(e) {
   totalPrice = parseInt(e.target.value);
@@ -26212,7 +26300,7 @@ async function updateDocOriginal() {
   if (!originalFile) {
     return;
   }
-  const pdfFile = await new Promise((res, rej) => {
+  const pdfFile = await new Promise((res, _rej) => {
     const fileReader = new FileReader();
     fileReader.onload = function () {
       res(fileReader.result);
@@ -26229,7 +26317,7 @@ async function updateDoc() {
   const font = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
   const page = pdfDoc.getPage(0);
   let lineNr = 0;
-  const y = yValue || yDefault;
+  const y = yValue || yStart - rowH * (guestsNum + 1);
   if (totalPrice || refundedPrice) {
     drawTextRightAlign(page, lines[0], {
       x: xL,
@@ -26270,16 +26358,25 @@ async function updateDoc() {
     lineNr++;
   }
 }
-async function updateDates() {
-  if (!pdfDoc) {
+async function updateConfigFromDocOriginal() {
+  if (!pdfDocOrig) {
     return;
   }
+  const screenH = window.screen.availHeight;
+  const pageH = Math.ceil(pdfDocOrig.getPage(0).getHeight());
+  const screenW = window.screen.availWidth;
+  const pageW = Math.ceil(pdfDocOrig.getPage(0).getWidth());
+  const newScaleY = roundToDecimal((screenH - 320) / pageH, 2);
+  const newScaleX = roundToDecimal((screenW - 40) / pageW, 2);
+  const newScale = Math.min(newScaleY, newScaleX);
+  previewScale = newScale > 1 ? 1 : newScale;
   try {
-    const pdf = await pdfjsLib.getDocument(await pdfDoc.save()).promise;
+    const pdf = await pdfjsLib.getDocument(await pdfDocOrig.save()).promise;
     const page = await pdf.getPage(1);
     const textItems = await page.getTextContent();
     let nextIsStartDate = false;
     let nextIsEndDate = false;
+    let nextIsGuestsNum = false;
     for (const textItem of textItems.items) {
       const str = textItem.str.replace(/\s/g, '');
       if (str === '') {
@@ -26293,6 +26390,10 @@ async function updateDates() {
         nextIsEndDate = true;
         continue;
       }
+      if (str === 'Ospiti/Guests') {
+        nextIsGuestsNum = true;
+        continue;
+      }
       if (nextIsStartDate) {
         nextIsStartDate = false;
         startDate = extractDate(str);
@@ -26303,7 +26404,19 @@ async function updateDates() {
         endDate = extractDate(str);
         continue;
       }
+      if (nextIsGuestsNum) {
+        nextIsGuestsNum = false;
+        guestsNum = parseInt(str);
+        continue;
+      }
     }
+    const msg = `
+    Extracted data:
+      - startDate: ${startDate}
+      - endDate: ${endDate}
+      - guestsNum: ${guestsNum}
+    `;
+    console.debug(msg);
   } catch (e) {
     console.error(e);
   }
@@ -26315,7 +26428,7 @@ async function updatePreview() {
   if (!pdfDoc) {
     return;
   }
-  await render(pdfPreviewCanvas, 1);
+  await render(pdfPreviewCanvas, previewScale);
 }
 async function render(canvas, scale) {
   try {
@@ -26380,8 +26493,14 @@ function initToolsMenu() {
       style: "margin-right: 30px;"
     }, "RICEVUTA IMP. SOGGIORNO"), VM.h("button", {
       onclick: openImageToPdf
-    }, "IMMAGINI >> PDF")))),
+    }, "IMMAGINI >> PDF")), VM.h("div", {
+      class: "res-ctx"
+    }))),
     theme: 'light'
+  });
+  document.addEventListener(EVENT_RESERVATION_CTX, () => {
+    const resCtx = appCtx.reservationCtx;
+    toolsMenu.body.querySelector('.res-ctx').textContent = JSON.stringify(resCtx, undefined, 2);
   });
 }
 function closeToolsMenu() {
