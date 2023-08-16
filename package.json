@@ -6,7 +6,7 @@
   "license": "GPL-3.0-or-later",
   "private": true,
   "engines": {
-    "node": ">=12"
+    "node": ">=18"
   },
   "scripts": {
     "prepare": "husky install",

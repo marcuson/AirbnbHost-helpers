@@ -2,6 +2,7 @@ import { IPanelResult } from '@violentmonkey/ui';
 import { PDFDocument } from 'pdf-lib';
 import { TextItem } from 'pdfjs-dist/types/src/display/api';
 import { downloadBlob, downloadURL } from '../utils/dwl-utils';
+import { roundToDecimal } from '../utils/num-utils';
 import { drawTextRightAlign, renderPageOnCanvas } from '../utils/pdf-utils';
 import { newPanel } from '../utils/ui-utils';
 
@@ -15,7 +16,8 @@ const fontSize = 9;
 
 const xL = 710;
 const xR = 717;
-const yDefault = 76;
+const yStart = 150;
+const rowH = 20;
 const h = 12;
 
 const pdfPreviewCanvas = VM.m(
@@ -32,6 +34,8 @@ let refundedPrice: number = null;
 let yValue: number = null;
 let startDate: string;
 let endDate: string;
+let guestsNum = 0;
+let previewScale = 1;
 
 export function openImpSoggiornoPanel() {
   if (!impSoggiornoPanel) {
@@ -68,12 +72,7 @@ function initPanel(): IPanelResult {
         </div>
         <div>
           Coord. Y (dal basso):&nbsp;
-          <input
-            type="number"
-            id="yValue"
-            value="76"
-            onchange={onYValueChange}
-          ></input>
+          <input type="number" id="yValue" onchange={onYValueChange}></input>
         </div>
         <div>
           <button
@@ -96,9 +95,9 @@ function initPanel(): IPanelResult {
 async function onFileChange(e: Event) {
   originalFile = (e.target as HTMLInputElement).files[0];
   await updateDocOriginal();
+  await updateConfigFromDocOriginal();
   await updateDoc();
   await updatePreview();
-  await updateDates();
 }
 
 async function onTotalChange(e: Event) {
@@ -124,7 +123,7 @@ async function updateDocOriginal() {
     return;
   }
 
-  const pdfFile = await new Promise<ArrayBuffer>((res, rej) => {
+  const pdfFile = await new Promise<ArrayBuffer>((res, _rej) => {
     const fileReader = new FileReader();
     fileReader.onload = function () {
       res(fileReader.result as ArrayBuffer);
@@ -144,7 +143,7 @@ async function updateDoc() {
   const font = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
   const page = pdfDoc.getPage(0);
   let lineNr = 0;
-  const y = yValue || yDefault;
+  const y = yValue || yStart - rowH * (guestsNum + 1);
 
   if (totalPrice || refundedPrice) {
     drawTextRightAlign(page, lines[0], {
@@ -189,20 +188,32 @@ async function updateDoc() {
   }
 }
 
-async function updateDates() {
-  if (!pdfDoc) {
+async function updateConfigFromDocOriginal() {
+  if (!pdfDocOrig) {
     return;
   }
 
+  const screenH = window.screen.availHeight;
+  const pageH = Math.ceil(pdfDocOrig.getPage(0).getHeight());
+  const screenW = window.screen.availWidth;
+  const pageW = Math.ceil(pdfDocOrig.getPage(0).getWidth());
+  const newScaleY = roundToDecimal((screenH - 320) / pageH, 2);
+  const newScaleX = roundToDecimal((screenW - 40) / pageW, 2);
+  const newScale = Math.min(newScaleY, newScaleX);
+  previewScale = newScale > 1 ? 1 : newScale;
+
   try {
-    const pdf = await pdfjsLib.getDocument(await pdfDoc.save()).promise;
+    const pdf = await pdfjsLib.getDocument(await pdfDocOrig.save()).promise;
     const page = await pdf.getPage(1);
+
     const textItems = await page.getTextContent();
 
     let nextIsStartDate = false;
     let nextIsEndDate = false;
+    let nextIsGuestsNum = false;
     for (const textItem of textItems.items as TextItem[]) {
       const str = textItem.str.replace(/\s/g, '');
+
       if (str === '') {
         continue;
       }
@@ -217,6 +228,11 @@ async function updateDates() {
         continue;
       }
 
+      if (str === 'Ospiti/Guests') {
+        nextIsGuestsNum = true;
+        continue;
+      }
+
       if (nextIsStartDate) {
         nextIsStartDate = false;
         startDate = extractDate(str);
@@ -228,7 +244,21 @@ async function updateDates() {
         endDate = extractDate(str);
         continue;
       }
+
+      if (nextIsGuestsNum) {
+        nextIsGuestsNum = false;
+        guestsNum = parseInt(str);
+        continue;
+      }
     }
+
+    const msg = `
+    Extracted data:
+      - startDate: ${startDate}
+      - endDate: ${endDate}
+      - guestsNum: ${guestsNum}
+    `;
+    console.debug(msg);
   } catch (e) {
     console.error(e);
   }
@@ -243,7 +273,7 @@ async function updatePreview() {
     return;
   }
 
-  await render(pdfPreviewCanvas, 1);
+  await render(pdfPreviewCanvas, previewScale);
 }
 
 async function render(canvas: HTMLCanvasElement, scale: number) {

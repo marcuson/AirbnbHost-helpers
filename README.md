@@ -5,17 +5,17 @@ This is a userscript initiated from [@violentmonkey/generator-userscript](https:
 ## Development
 
 ``` sh
-$ yarn dev
+$ pnpm run dev
 ```
 
 ## Building
 
 ```sh
-$ yarn build
+$ pnpm run build
 ```
 
 ## Lint
 
 ``` sh
-$ yarn lint
+$ pnpm run lint
 ```
