@@ -1,5 +1,7 @@
 import { IPanelResult } from '@violentmonkey/ui';
 import { createIcons, PenTool } from 'lucide';
+import { appCtx } from '../app-ctx';
+import { EVENT_RESERVATION_CTX } from '../models/events';
 import { newPanel } from '../utils/ui-utils';
 import { openImageToPdfPanel } from './images-to-pdf';
 import { openImpSoggiornoPanel } from './imposta-soggiorno';
@@ -49,9 +51,19 @@ function initToolsMenu() {
           </button>
           <button onclick={openImageToPdf}>IMMAGINI &gt;&gt; PDF</button>
         </div>
+        <div class="res-ctx"></div>
       </div>
     ),
     theme: 'light',
+  });
+
+  document.addEventListener(EVENT_RESERVATION_CTX, () => {
+    const resCtx = appCtx.reservationCtx;
+    toolsMenu.body.querySelector('.res-ctx').textContent = JSON.stringify(
+      resCtx,
+      undefined,
+      2
+    );
   });
 }
 

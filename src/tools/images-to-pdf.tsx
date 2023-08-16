@@ -1,6 +1,7 @@
 import { IPanelResult } from '@violentmonkey/ui';
 import { createElement, RotateCw } from 'lucide';
 import { degrees, PDFDocument, PDFImage } from 'pdf-lib';
+import { appCtx } from '../app-ctx';
 import { downloadBlob } from '../utils/dwl-utils';
 import { newPanel } from '../utils/ui-utils';
 
@@ -13,9 +14,6 @@ const imageEntries: ImageToPdfEntry[] = [];
 let imagesDiv: HTMLDivElement;
 const imageContainers: Node[] = [];
 const images: HTMLImageElement[] = [];
-
-let startDate: string;
-let endDate: string;
 
 const imagesToPdfPanel: IPanelResult = initPanel();
 
@@ -47,6 +45,16 @@ function initPanel(): IPanelResult {
             }}
           >
             Scarica file PDF
+          </button>
+          <button
+            style="margin-right: 30px;"
+            onclick={async (e: Event) => {
+              e.preventDefault();
+              e.stopPropagation();
+              onDownloadBtnClick('-DOCS');
+            }}
+          >
+            Scarica file PDF (doc. identità)
           </button>
           <button
             onclick={async (e: Event) => {
@@ -123,7 +131,7 @@ function clear() {
 }
 
 function getFilename(): string {
-  return `${startDate}-${endDate}`;
+  return `${appCtx.reservationCtx?.dateFromStr}-${appCtx.reservationCtx?.dateToStr}`;
 }
 
 async function generatePdf(): Promise<PDFDocument> {
@@ -182,8 +190,12 @@ function onClearBtnClick() {
   clear();
 }
 
-async function onDownloadBtnClick() {
+async function onDownloadBtnClick(filenameSuffix?: string) {
   const pdfDoc = await generatePdf();
   const filename = getFilename();
-  downloadBlob(await pdfDoc.save(), `${filename}.pdf`, 'application/pdf');
+  downloadBlob(
+    await pdfDoc.save(),
+    `${filename}${filenameSuffix ?? ''}.pdf`,
+    'application/pdf'
+  );
 }
