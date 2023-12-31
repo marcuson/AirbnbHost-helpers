@@ -9,17 +9,17 @@ Install from [GreasyFork](https://greasyfork.org/en/scripts/454980-helper-for-al
 This is a userscript initiated from [@violentmonkey/generator-userscript](https://github.com/violentmonkey/generator-userscript).
 
 ``` sh
-$ pnpm run dev
+pnpm run dev
 ```
 
 ### Building
 
 ```sh
-$ pnpm run build
+pnpm run build
 ```
 
 ### Lint
 
 ``` sh
-$ pnpm run lint
+pnpm run lint
 ```
