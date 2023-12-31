@@ -2,7 +2,7 @@
 
 ## Installation
 
-Install from [GreasyFork](https://greasyfork.org/en/scripts/454980-helper-for-alloggiatiweb) page or directly from the [Github pages link](https://github.com/marcuson/alloggiatiweb-helpers/raw/gh-pages/index.user.js).
+Install from [GreasyFork](https://greasyfork.org/en/scripts/454980-helper-for-alloggiatiweb) page or directly from the [Github pages link](https://marcuson.github.io/AirbnbHost-helpers/index.user.js).
 
 ## Development
 
