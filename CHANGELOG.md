@@ -1,3 +1,10 @@
+## [1.4.1](https://github.com/marcuson/AirbnbHost-helpers/compare/1.4.0...1.4.1) (2023-12-31)
+
+
+### Bug Fixes
+
+* Correctly compute date range for bookings halfways between two months/years. ([7dd873a](https://github.com/marcuson/AirbnbHost-helpers/commit/7dd873a2dad73be4a8b13d6417d2883700d1d30a))
+
 # [1.4.0](https://github.com/marcuson/AirbnbHost-helpers/compare/1.3.1...1.4.0) (2023-08-16)
 
 
