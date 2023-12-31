@@ -5,7 +5,7 @@
 // @description Helpers for hosts on the Airbnb platform.
 // @match       https://www.airbnb.*/hosting
 // @match       https://www.airbnb.*/hosting/*
-// @version     1.4.0
+// @version     1.4.1
 // @author      marcuson
 // @license     GPL-3.0-or-later
 // @downloadURL https://github.com/marcuson/AirbnbHost-helpers/raw/gh-pages/index.user.js
@@ -26154,15 +26154,89 @@ function extractReservationCtxFromDetailsHeader(detailsHeader) {
   extractReservationCtxFromText(dateRangeText);
 }
 function extractReservationCtxFromText(dateRangeText) {
-  const [daysRange, monthThreeLett, yearSplit] = dateRangeText.replace(/\(.*/, '').trim().split(' ');
+  const dateRangeTextSplit = dateRangeText.replace(/\(.*/, '').trim().split(' ');
+  let dateRange;
+  switch (dateRangeTextSplit.length) {
+    case 2:
+    case 3:
+      dateRange = extractCompactDateRange(dateRangeTextSplit);
+      break;
+    case 5:
+    case 6:
+      dateRange = extractMidDateRange(dateRangeTextSplit);
+      break;
+    case 7:
+      dateRange = extractLongDateRange(dateRangeTextSplit);
+      break;
+  }
+  const {
+    to,
+    from
+  } = dateRange;
+  const resCtx = {
+    dateFromStr: `${from.year}${from.month}${from.day}`,
+    dateToStr: `${to.year}${to.month}${to.day}`
+  };
+  appCtx.reservationCtx = resCtx;
+}
+function extractCompactDateRange(dateRangeTextSplit) {
+  const [daysRange, monthThreeLett, yearSplit] = dateRangeTextSplit;
   const year = yearSplit != null ? yearSplit : new Date().getFullYear().toString();
   const month = threeLetterMonthToNum(monthThreeLett).toFixed(0).padStart(2, '0');
   const [dayStart, dayEnd] = daysRange.split('–').map(x => x.padStart(2, '0'));
-  const resCtx = {
-    dateFromStr: `${year}${month}${dayStart}`,
-    dateToStr: `${year}${month}${dayEnd}`
+  return {
+    from: {
+      day: dayStart,
+      month: month,
+      year: year
+    },
+    to: {
+      day: dayEnd,
+      month: month,
+      year: year
+    }
   };
-  appCtx.reservationCtx = resCtx;
+}
+function extractMidDateRange(dateRangeTextSplit) {
+  const [dayStrStart, monthThreeLettStart, _dash, dayStrEnd, monthThreeLettEnd, yearStr] = dateRangeTextSplit;
+  const year = yearStr != null ? yearStr : new Date().getFullYear().toString();
+  const monthStart = threeLetterMonthToNum(monthThreeLettStart).toFixed(0).padStart(2, '0');
+  const monthEnd = threeLetterMonthToNum(monthThreeLettEnd).toFixed(0).padStart(2, '0');
+  const dayStart = dayStrStart.padStart(2, '0');
+  const dayEnd = dayStrEnd.padStart(2, '0');
+  return {
+    from: {
+      day: dayStart,
+      month: monthStart,
+      year: year
+    },
+    to: {
+      day: dayEnd,
+      month: monthEnd,
+      year: year
+    }
+  };
+}
+function extractLongDateRange(dateRangeTextSplit) {
+  const [dayStrStart, monthThreeLettStart, yearStrStart, _dash, dayStrEnd, monthThreeLettEnd, yearStrEnd] = dateRangeTextSplit;
+  const yearStart = yearStrStart;
+  const yearEnd = yearStrEnd;
+  const monthStart = threeLetterMonthToNum(monthThreeLettStart).toFixed(0).padStart(2, '0');
+  const monthEnd = threeLetterMonthToNum(monthThreeLettEnd).toFixed(0).padStart(2, '0');
+  const dayStart = dayStrStart.padStart(2, '0');
+  const dayEnd = dayStrEnd.padStart(2, '0');
+  return {
+    from: {
+      day: dayStart,
+      month: monthStart,
+      year: yearStart
+    },
+    to: {
+      day: dayEnd,
+      month: monthEnd,
+      year: yearEnd
+    }
+  };
 }
 
 const moduleDef$1 = {
