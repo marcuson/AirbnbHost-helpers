@@ -18,9 +18,7 @@ export function stopObserveDOM() {
 
 function listenForDOMThread(): () => void {
   return VM.observe(document.body, () => {
-    const inboxThread = document.querySelector(
-      'section[data-testid=orbital-panel-host-messaging-message-thread]'
-    );
+    const inboxThread = document.querySelector('section#thread_panel');
 
     if (inboxThread) {
       console.debug('Inbox thread loaded, start listening for images');
@@ -33,7 +31,7 @@ function listenForDOMThread(): () => void {
 function listenForDOMThreadImages(inboxThread: Element): () => void {
   return VM.observe(inboxThread, () => {
     const imageNodes = [
-      ...document.querySelectorAll('div[role=img][data-testid^=image-asset-]'),
+      ...document.querySelectorAll('div[data-testid^=image-asset-]'),
     ].filter(
       (x) =>
         x.getAttribute('data-ahh-augmented') !== 'true' &&

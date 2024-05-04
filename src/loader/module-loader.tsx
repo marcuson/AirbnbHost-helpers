@@ -38,7 +38,7 @@ function loadModule(mod: ModuleDef) {
 
 function getCorrectModule(path: string): ModuleDef {
   // choose module to load according to current path
-  if (path.startsWith('/hosting/inbox')) {
+  if (path.startsWith('/hosting/messages')) {
     return inboxModule.moduleDef;
   }
 

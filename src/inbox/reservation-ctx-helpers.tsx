@@ -15,17 +15,8 @@ export function stopObserveDOM() {
 
 function listenForDOMThread(): () => void {
   return VM.observe(document.body, () => {
-    const inboxHeader = document.querySelector(
-      'button[data-testid=host-inbox-open-thread-details-button] h3'
-    );
-    if (inboxHeader) {
-      console.debug('Inbox header loaded, get reservation ctx');
-      extractResCtxFromInboxHeader(inboxHeader as HTMLElement);
-      return true;
-    }
-
     const detailsHeader = document.querySelector(
-      'div[data-testid=host-inbox-reservation-details] #FMP-target'
+      'section#thread_details_panel #FMP-target'
     );
 
     if (detailsHeader) {
@@ -34,13 +25,6 @@ function listenForDOMThread(): () => void {
       return true;
     }
   });
-}
-
-function extractResCtxFromInboxHeader(inboxHeader: HTMLElement): void {
-  const dateRangeText = (
-    inboxHeader.nextSibling.textContent.split('·')[1] as string
-  ).trim();
-  extractReservationCtxFromText(dateRangeText);
 }
 
 function extractReservationCtxFromDetailsHeader(
