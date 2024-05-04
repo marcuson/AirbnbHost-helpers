@@ -5,7 +5,7 @@
 // @description Helpers for hosts on the Airbnb platform.
 // @match       https://www.airbnb.*/hosting
 // @match       https://www.airbnb.*/hosting/*
-// @version     1.4.1
+// @version     1.4.2
 // @author      marcuson
 // @license     GPL-3.0-or-later
 // @downloadURL https://github.com/marcuson/AirbnbHost-helpers/raw/gh-pages/index.user.js
@@ -26039,7 +26039,7 @@ function stopObserveDOM$1() {
 }
 function listenForDOMThread$1() {
   return VM.observe(document.body, () => {
-    const inboxThread = document.querySelector('section[data-testid=orbital-panel-host-messaging-message-thread]');
+    const inboxThread = document.querySelector('section#thread_panel');
     if (inboxThread) {
       console.debug('Inbox thread loaded, start listening for images');
       domThreadImagesDisconnector = listenForDOMThreadImages(inboxThread);
@@ -26049,7 +26049,7 @@ function listenForDOMThread$1() {
 }
 function listenForDOMThreadImages(inboxThread) {
   return VM.observe(inboxThread, () => {
-    const imageNodes = [...document.querySelectorAll('div[role=img][data-testid^=image-asset-]')].filter(x => x.getAttribute('data-ahh-augmented') !== 'true' && x.getAttribute('data-testid') !== 'image-asset-undefined');
+    const imageNodes = [...document.querySelectorAll('div[data-testid^=image-asset-]')].filter(x => x.getAttribute('data-ahh-augmented') !== 'true' && x.getAttribute('data-testid') !== 'image-asset-undefined');
     if (imageNodes.length <= 0) {
       return;
     }
@@ -26131,23 +26131,13 @@ function stopObserveDOM() {
 }
 function listenForDOMThread() {
   return VM.observe(document.body, () => {
-    const inboxHeader = document.querySelector('button[data-testid=host-inbox-open-thread-details-button] h3');
-    if (inboxHeader) {
-      console.debug('Inbox header loaded, get reservation ctx');
-      extractResCtxFromInboxHeader(inboxHeader);
-      return true;
-    }
-    const detailsHeader = document.querySelector('div[data-testid=host-inbox-reservation-details] #FMP-target');
+    const detailsHeader = document.querySelector('section#thread_details_panel #FMP-target');
     if (detailsHeader) {
       console.debug('Details header loaded, get reservation ctx');
       extractReservationCtxFromDetailsHeader(detailsHeader);
       return true;
     }
   });
-}
-function extractResCtxFromInboxHeader(inboxHeader) {
-  const dateRangeText = inboxHeader.nextSibling.textContent.split('·')[1].trim();
-  extractReservationCtxFromText(dateRangeText);
 }
 function extractReservationCtxFromDetailsHeader(detailsHeader) {
   const dateRangeText = detailsHeader.nextSibling.nextSibling.textContent;
@@ -26626,7 +26616,7 @@ function loadModule(mod) {
 }
 function getCorrectModule(path) {
   // choose module to load according to current path
-  if (path.startsWith('/hosting/inbox')) {
+  if (path.startsWith('/hosting/messages')) {
     return moduleDef$1;
   }
   return undefined;
