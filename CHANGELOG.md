@@ -1,3 +1,10 @@
+## [1.4.2](https://github.com/marcuson/AirbnbHost-helpers/compare/1.4.1...1.4.2) (2024-05-04)
+
+
+### Bug Fixes
+
+* Host inbox fixes for latest Airbnb summer 2024 release (preview). ([f989ca3](https://github.com/marcuson/AirbnbHost-helpers/commit/f989ca386d4586ea209424165d48ac0f75c15def))
+
 ## [1.4.1](https://github.com/marcuson/AirbnbHost-helpers/compare/1.4.0...1.4.1) (2023-12-31)
 
 
