@@ -131,7 +131,8 @@ async function updateDocOriginal() {
     fileReader.readAsArrayBuffer(originalFile);
   });
 
-  pdfDocOrig = await PDFLib.PDFDocument.load(pdfFile);
+  const pdfB64 = btoa(String.fromCharCode(...new Uint8Array(pdfFile)));
+  pdfDocOrig = await PDFLib.PDFDocument.load(pdfB64);
 }
 
 async function updateDoc() {
