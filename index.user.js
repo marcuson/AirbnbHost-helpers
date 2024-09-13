@@ -5,7 +5,7 @@
 // @description Helpers for hosts on the Airbnb platform.
 // @match       https://www.airbnb.*/hosting
 // @match       https://www.airbnb.*/hosting/*
-// @version     1.4.2
+// @version     1.4.3
 // @author      marcuson
 // @license     GPL-3.0-or-later
 // @downloadURL https://github.com/marcuson/AirbnbHost-helpers/raw/gh-pages/index.user.js
@@ -26131,16 +26131,20 @@ function stopObserveDOM() {
 }
 function listenForDOMThread() {
   return VM.observe(document.body, () => {
-    const detailsHeader = document.querySelector('section#thread_details_panel #FMP-target');
+    const detailsHeader = document.querySelector('section#thread_details_panel');
     if (detailsHeader) {
+      const dateElem = detailsHeader.querySelector('div[data-testid="hrd-sbui-header-section"]>div>div:nth-child(3)');
+      if (!dateElem) {
+        return false;
+      }
       console.debug('Details header loaded, get reservation ctx');
-      extractReservationCtxFromDetailsHeader(detailsHeader);
+      extractReservationCtxFromDetailsHeader(dateElem);
       return true;
     }
   });
 }
-function extractReservationCtxFromDetailsHeader(detailsHeader) {
-  const dateRangeText = detailsHeader.nextSibling.nextSibling.textContent;
+function extractReservationCtxFromDetailsHeader(dateElem) {
+  const dateRangeText = dateElem.textContent;
   extractReservationCtxFromText(dateRangeText);
 }
 function extractReservationCtxFromText(dateRangeText) {
