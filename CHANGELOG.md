@@ -1,3 +1,10 @@
+## [1.4.3](https://github.com/marcuson/AirbnbHost-helpers/compare/1.4.2...1.4.3) (2024-09-13)
+
+
+### Bug Fixes
+
+* Fix reservation date search after latest Airbnb website update. ([46d319b](https://github.com/marcuson/AirbnbHost-helpers/commit/46d319b0c2fa50cf0767d7abb70d543519416b05))
+
 ## [1.4.2](https://github.com/marcuson/AirbnbHost-helpers/compare/1.4.1...1.4.2) (2024-05-04)
 
 
