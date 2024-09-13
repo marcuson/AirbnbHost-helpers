@@ -16,21 +16,26 @@ export function stopObserveDOM() {
 function listenForDOMThread(): () => void {
   return VM.observe(document.body, () => {
     const detailsHeader = document.querySelector(
-      'section#thread_details_panel #FMP-target'
+      'section#thread_details_panel'
     );
 
     if (detailsHeader) {
+      const dateElem = detailsHeader.querySelector(
+        'div[data-testid="hrd-sbui-header-section"]>div>div:nth-child(3)'
+      );
+      if (!dateElem) {
+        return false;
+      }
+
       console.debug('Details header loaded, get reservation ctx');
-      extractReservationCtxFromDetailsHeader(detailsHeader as HTMLElement);
+      extractReservationCtxFromDetailsHeader(dateElem as HTMLElement);
       return true;
     }
   });
 }
 
-function extractReservationCtxFromDetailsHeader(
-  detailsHeader: HTMLElement
-): void {
-  const dateRangeText = detailsHeader.nextSibling.nextSibling.textContent;
+function extractReservationCtxFromDetailsHeader(dateElem: HTMLElement): void {
+  const dateRangeText = dateElem.textContent;
   extractReservationCtxFromText(dateRangeText);
 }
 
