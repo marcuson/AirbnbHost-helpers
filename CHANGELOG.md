@@ -1,3 +1,10 @@
+## [1.4.4](https://github.com/marcuson/AirbnbHost-helpers/compare/1.4.3...1.4.4) (2024-12-22)
+
+
+### Bug Fixes
+
+* Update imposta soggiorno coordinates for latest Motourist release. ([3096bd9](https://github.com/marcuson/AirbnbHost-helpers/commit/3096bd91901a7eb1bf2eb6caa46fd1f56ae2bc94))
+
 ## [1.4.3](https://github.com/marcuson/AirbnbHost-helpers/compare/1.4.2...1.4.3) (2024-09-13)
 
 
