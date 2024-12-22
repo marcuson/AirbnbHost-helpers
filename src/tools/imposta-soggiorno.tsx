@@ -1,4 +1,5 @@
 import { IPanelResult } from '@violentmonkey/ui';
+import { differenceInDays, parse } from 'date-fns';
 import { PDFDocument } from 'pdf-lib';
 import { TextItem } from 'pdfjs-dist/types/src/display/api';
 import { downloadBlob, downloadURL } from '../utils/dwl-utils';
@@ -12,13 +13,13 @@ const lines = [
   'restituiti tramite rimborso Airbnb per esenzioni minori anni 12',
 ];
 
-const fontSize = 9;
+const fontSize = 7;
 
-const xL = 710;
-const xR = 717;
-const yStart = 150;
+const xL = 502;
+const xTextToPriceOffset = 7;
+const yStart = 526;
 const rowH = 20;
-const h = 12;
+const h = 10;
 
 const pdfPreviewCanvas = VM.m(
   <canvas id="pdfPreview" style="border: solid 1px;"></canvas>
@@ -31,6 +32,7 @@ let pdfDoc: PDFDocument = null;
 
 let totalPrice: number = null;
 let refundedPrice: number = null;
+let xValue: number = null;
 let yValue: number = null;
 let startDate: string;
 let endDate: string;
@@ -73,6 +75,10 @@ function initPanel(): IPanelResult {
         <div>
           Coord. Y (dal basso):&nbsp;
           <input type="number" id="yValue" onchange={onYValueChange}></input>
+        </div>
+        <div>
+          Coord. X (da sinistra):&nbsp;
+          <input type="number" id="xValue" onchange={onXValueChange}></input>
         </div>
         <div>
           <button
@@ -118,6 +124,12 @@ async function onYValueChange(e: Event) {
   await updatePreview();
 }
 
+async function onXValueChange(e: Event) {
+  xValue = parseInt((e.target as HTMLInputElement).value);
+  await updateDoc();
+  await updatePreview();
+}
+
 async function updateDocOriginal() {
   if (!originalFile) {
     return;
@@ -143,11 +155,14 @@ async function updateDoc() {
   const font = await pdfDoc.embedFont(PDFLib.StandardFonts.Helvetica);
   const page = pdfDoc.getPage(0);
   let lineNr = 0;
-  const y = yValue || yStart - rowH * (guestsNum + 1);
+  const days = getDaysDiff();
+  const y = yValue || yStart - rowH * (days + 1);
+  const xl = xValue || xL;
+  const xr = xl + xTextToPriceOffset;
 
   if (totalPrice || refundedPrice) {
     drawTextRightAlign(page, lines[0], {
-      x: xL,
+      x: xl,
       y: y + h * lineNr,
       font: font,
       size: fontSize,
@@ -157,13 +172,13 @@ async function updateDoc() {
 
   if (totalPrice) {
     drawTextRightAlign(page, lines[1], {
-      x: xL,
+      x: xl,
       y: y - h * lineNr,
       font: font,
       size: fontSize,
     });
     page.drawText(totalPrice.toFixed(2) + ' €', {
-      x: xR,
+      x: xr,
       y: y - h * lineNr,
       font: font,
       size: fontSize,
@@ -173,13 +188,13 @@ async function updateDoc() {
 
   if (refundedPrice) {
     drawTextRightAlign(page, lines[2], {
-      x: xL,
+      x: xl,
       y: y - h * lineNr,
       font: font,
       size: fontSize,
     });
     page.drawText('-' + refundedPrice.toFixed(2) + ' €', {
-      x: xR - font.widthOfTextAtSize('-', fontSize),
+      x: xr - font.widthOfTextAtSize('-', fontSize),
       y: y - h * lineNr,
       font: font,
       size: fontSize,
@@ -287,6 +302,13 @@ async function render(canvas: HTMLCanvasElement, scale: number) {
 
 function getFilename(): string {
   return `${startDate}-${endDate}`;
+}
+
+function getDaysDiff(): number {
+  const start = parse(startDate, 'yyyyMMdd', new Date());
+  const end = parse(endDate, 'yyyyMMdd', new Date());
+  const days = differenceInDays(end, start);
+  return days;
 }
 
 async function onDownloadBtnClick() {
